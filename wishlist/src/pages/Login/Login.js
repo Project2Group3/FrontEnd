@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import './Login.css';
 
 const App = () => {
   useEffect(() => {
@@ -27,3 +28,11 @@ const App = () => {
     </div>
   );
 };
+
+function Login() {
+  return (
+    <h1>Login</h1>
+  );
+}
+
+export default Login;
