@@ -1,34 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import './EditItem.css'; 
+import React, { useState } from 'react';
+import './AddNewItem.css';
 
-const EditItem = ({ itemId }) => {
+const AddNewItem = () => {
     const [formData, setFormData] = useState({
         itemName: '',
         itemPrice: '',
         itemDescription: '',
         itemUrl: '',
-        itemImage: '',
         priority: '0'
     });
-
-    useEffect(() => {
-        // Simulating fetching item data from an API
-        const fetchItemData = async () => {
-            // In a real application, you would fetch the data from your API
-            // For this example, we'll use dummy data
-            const dummyData = {
-                itemName: 'Example Item',
-                itemPrice: '99.99',
-                itemDescription: 'This is an example item description.',
-                itemUrl: 'https://example.com/item',
-                itemImage: 'https://example.com/image.jpg',
-                priority: '3'
-            };
-            setFormData(dummyData);
-        };
-
-        fetchItemData();
-    }, [itemId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -41,21 +21,21 @@ const EditItem = ({ itemId }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Form submitted', formData);
-        // Add your API call logic here to update the item
+        // Add your API call logic here
     };
 
     return (
         <div>
             <header className="header">
-                <a href="#">Home</a>
-                <a href="#">Add Item</a>
-                <a href="#">Edit Items/List</a>
-                <a href="#">List</a>
-                <a href="#">Admin</a>
+            <Link to="/">Home</Link>
+                <Link to="/add-item">Add Item</Link>
+                <Link to="../../EditUser/EditUser.js">Edit User</Link>
+                <Link to="/list">List</Link>
+                <Link to="/admin">Admin</Link>
             </header>
-            <div className="edit-item-container">
-                <h2>Edit Item in Your Wishlist</h2>
-                <form id="editItemForm" onSubmit={handleSubmit}>
+            <div className="add-item-container">
+                <h2>Add New Item to Your Wishlist</h2>
+                <form id="addItemForm" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="itemName">Name:</label>
                         <input 
@@ -99,19 +79,9 @@ const EditItem = ({ itemId }) => {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="itemImage">Image URL:</label>
-                        <input 
-                            type="url" 
-                            id="itemImage" 
-                            name="itemImage"
-                            value={formData.itemImage}
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <div className="form-group">
                         <label>Priority:</label>
                         <div className="star-rating">
-                            {[1, 2, 3, 4, 5].map((star) => (
+                            {[5, 4, 3, 2, 1].map((star) => (
                                 <React.Fragment key={star}>
                                     <input
                                         type="radio"
@@ -126,11 +96,11 @@ const EditItem = ({ itemId }) => {
                             ))}
                         </div>
                     </div>
-                    <button type="submit">Update</button>
+                    <button type="submit">Submit</button>
                 </form>
             </div>
         </div>
     );
 };
 
-export default EditItem;
+export default AddNewItem;
