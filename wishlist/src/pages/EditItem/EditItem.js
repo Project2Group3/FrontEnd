@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './EditItem.css'; 
 
 const EditItem = ({ itemId }) => {
@@ -46,13 +47,18 @@ const EditItem = ({ itemId }) => {
 
     return (
         <div>
-            <header className="header">
-                <a href="#">Home</a>
-                <a href="#">Add Item</a>
-                <a href="#">Edit Items/List</a>
-                <a href="#">List</a>
-                <a href="#">Admin</a>
-            </header>
+            <div className="header">
+                <div>
+                    <Link to="/">Home</Link>
+                    <Link to="/AddNewItem">Add Item</Link>
+                    <Link to="/EditItem">Edit List</Link>
+                    <Link to="/Lists">Preview List</Link>
+                    <Link to="/EditUser">User Settings</Link>
+                    <Link to="/Admin">Admin</Link>
+                </div>
+                <Link to="/logout">Logout</Link>
+            </div>
+            
             <div className="edit-item-container">
                 <h2>Edit Item in Your Wishlist</h2>
                 <form id="editItemForm" onSubmit={handleSubmit}>
