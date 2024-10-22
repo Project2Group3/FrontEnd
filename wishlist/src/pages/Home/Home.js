@@ -11,7 +11,7 @@ function Home() {
       <Link to="/Login">
         <button>Login</button>
       </Link>
-      <Link to="/AddItem">
+      <Link to="/AddNewItem/">
         <button>Add Item</button>
       </Link>
       <Link to="/EditItem">
@@ -22,6 +22,9 @@ function Home() {
       </Link>
       <Link to="/EditUser">
         <button>Edit User</button>
+      </Link>
+      <Link to="/Admin">
+        <button>Admin</button>
       </Link>
     </div>
   );

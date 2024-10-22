@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
 import './AddNewItem.css';
 
 const AddNewItem = () => {
@@ -26,13 +29,18 @@ const AddNewItem = () => {
 
     return (
         <div>
-            <header className="header">
-            <Link to="/">Home</Link>
-                <Link to="/add-item">Add Item</Link>
-                <Link to="../../EditUser/EditUser.js">Edit User</Link>
-                <Link to="/list">List</Link>
-                <Link to="/admin">Admin</Link>
-            </header>
+            <div className="header">
+                <div>
+                    <Link to="/">Home</Link>
+                    <Link to="/AddNewItem">Add Item</Link>
+                    <Link to="/EditItem">Edit List</Link>
+                    <Link to="/Lists">Preview List</Link>
+                    <Link to="/EditUser">User Settings</Link>
+                    <Link to="/Admin">Admin</Link>
+                </div>
+                <Link to="/logout">Logout</Link>
+            </div>
+
             <div className="add-item-container">
                 <h2>Add New Item to Your Wishlist</h2>
                 <form id="addItemForm" onSubmit={handleSubmit}>
