@@ -1,38 +1,46 @@
-import React, { useEffect } from 'react';
-import './Login.css';
-
-const App = () => {
-  useEffect(() => {
-    
-    window.google.accounts.id.initialize({
-      client_id: '122135476318-du3spi1mi6rh5hu6b00ugqpl678kngg3.apps.googleusercontent.com',
-      callback: handleCredentialResponse,
-    });
-
-    
-    window.google.accounts.id.renderButton(
-      document.getElementById('googleSignInDiv'),
-      { theme: 'outline', size: 'large' } 
-    );
-  }, []);
-
-  const handleCredentialResponse = (response) => {
-    console.log('Encoded JWT ID token: ' + response.credential);
-    
-  };
-
-  return (
-    <div>
-      <h1>Web App</h1>
-      <div id="googleSignInDiv"></div> {}
-    </div>
-  );
-};
+import { GoogleLogin } from '@react-oauth/google';  
+import {jwtDecode} from 'jwt-decode';  
+import Cookies from 'js-cookie'; 
+import { useNavigate, Link } from 'react-router-dom';
 
 function Login() {
-  return (
-    <h1>Login</h1>
-  );
+    const navigate = useNavigate();  
+
+    return (
+        
+        <div className="flex justify-center items-center h-screen bg-indigo-600">
+                <div className="header">
+                    <Link to="/">Home</Link>
+                    <Link to="/AddNewItem">Add Item</Link>
+                    <Link to="/EditItem">Edit List</Link>
+                    <Link to="/Lists">Preview List</Link>
+                    <Link to="/EditUser">User Settings</Link>
+                    <Link to="/Admin">Admin</Link>
+                </div>
+            <div className="w-96 p-6 shadow-lg bg-white rounded-md">
+                <h1 className="text-3xl block text-center font-semibold">
+                    <i className="fa-solid fa-user"></i> Login using Google
+                </h1>
+                <hr className="mt-3" />
+                
+                <GoogleLogin
+                    onSuccess={credentialResponse => {
+                        const decoded = jwtDecode(credentialResponse.credential);
+                        
+                        console.log(decoded);
+
+                        Cookies.set('user', JSON.stringify(decoded), { expires: 7 });  
+                        console.log(Cookies.get('user'))
+
+                        navigate('/');
+                    }}
+                    onError={() => {
+                        console.log('Login Failed');
+                    }}
+                />
+            </div>
+        </div>
+    );
 }
 
 export default Login;

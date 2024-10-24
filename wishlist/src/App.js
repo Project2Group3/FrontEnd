@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import AddItem from './pages/AddNewItem/AddNewItem.js';
 import CreateAccount from './pages/CreateAccount/CreateAccount.js';
 import EditItem from './pages/EditItem/EditItem.js';
@@ -12,25 +12,23 @@ import './App.css';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <div className="page-top">
-          <h1>Wishlist Api</h1>
-        </div>
-        <div className="nav-area">
-          <Routes>
-            <Route path="/AddNewItem" element={<AddItem />} />
-            <Route path="/CreateAccount" element={<CreateAccount />} />
-            <Route path="/EditItem" element={<EditItem />} />
-            <Route path="/EditUser" element={<EditUser />} />
-            <Route path="/Lists" element={<Lists />} />
-            <Route path="/Login" element={<Login />} />
-            <Route path="/Admin" element={<Admin />} />
-            <Route path="/" element={<Home />} />
-          </Routes>
-        </div>
+    <div className="App">
+      <div className="page-top">
+        <h1>Wishlist Api</h1>
       </div>
-    </Router>
+      <div className="nav-area">
+        <Routes>
+          <Route path="/AddNewItem" element={<AddItem />} />
+          <Route path="/CreateAccount" element={<CreateAccount />} />
+          <Route path="/EditItem" element={<EditItem />} />
+          <Route path="/EditUser" element={<EditUser />} />
+          <Route path="/Lists" element={<Lists />} />
+          <Route path="/Login" element={<Login />} />
+          <Route path="/Admin" element={<Admin />} />
+          <Route path="/" element={<Home />} />
+        </Routes>
+      </div>
+    </div>
   );
 }
 
