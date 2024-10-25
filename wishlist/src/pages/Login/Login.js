@@ -1,38 +1,64 @@
-import React, { useEffect } from 'react';
-import './Login.css';
-
-const App = () => {
-  useEffect(() => {
-    
-    window.google.accounts.id.initialize({
-      client_id: '122135476318-du3spi1mi6rh5hu6b00ugqpl678kngg3.apps.googleusercontent.com',
-      callback: handleCredentialResponse,
-    });
-
-    
-    window.google.accounts.id.renderButton(
-      document.getElementById('googleSignInDiv'),
-      { theme: 'outline', size: 'large' } 
-    );
-  }, []);
-
-  const handleCredentialResponse = (response) => {
-    console.log('Encoded JWT ID token: ' + response.credential);
-    
-  };
-
-  return (
-    <div>
-      <h1>Web App</h1>
-      <div id="googleSignInDiv"></div> {}
-    </div>
-  );
-};
+import { GoogleLogin } from '@react-oauth/google';  
+import {jwtDecode} from 'jwt-decode';  
+import Cookies from 'js-cookie'; 
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
 function Login() {
-  return (
-    <h1>Login</h1>
-  );
+    const navigate = useNavigate();  
+
+    const handleGoogleLoginSuccess = async (credentialResponse) => {
+        const decoded = jwtDecode(credentialResponse.credential);
+
+        // Log the user info pulled from Google OAuth
+        console.log('Decoded user info:', decoded);
+
+        const userData = {
+            name: decoded.name,
+            email: decoded.email,
+            username: decoded.given_name,
+            image: decoded.picture,
+        };
+
+        try {
+            // Check if user exists and log user data to console
+            console.log('User data to send to backend:', userData);
+
+            const response = await axios.post('https://publish-0341c21de65c.herokuapp.com/users/login/', userData);
+            console.log('Response from backend:', response.data);
+
+            Cookies.set('user', JSON.stringify(response.data), { expires: 7 });
+            navigate('/');
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('An error occurred during login.');
+        }
+    };
+
+    return (
+        <div className="flex justify-center items-center h-screen bg-indigo-600">
+            <div className="header">
+                <Link to="/">Home</Link>
+                <Link to="/AddNewItem">Add Item</Link>
+                <Link to="/EditItem">Edit List</Link>
+                <Link to="/Lists">Preview List</Link>
+                <Link to="/EditUser">User Settings</Link>
+                <Link to="/Admin">Admin</Link>
+            </div>
+            <div className="w-96 p-6 shadow-lg bg-white rounded-md">
+                <h1 className="text-3xl block text-center font-semibold">
+                    <i className="fa-solid fa-user"></i> Login using Google
+                </h1>
+                <hr className="mt-3" />
+                <GoogleLogin
+                    onSuccess={handleGoogleLoginSuccess}
+                    onError={() => {
+                        console.log('Login Failed');
+                    }}
+                />
+            </div>
+        </div>
+    );
 }
 
 export default Login;
