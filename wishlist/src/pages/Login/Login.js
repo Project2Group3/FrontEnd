@@ -1,61 +1,82 @@
-import { GoogleLogin } from '@react-oauth/google';  
-import {jwtDecode} from 'jwt-decode';  
-import Cookies from 'js-cookie'; 
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './Login.css';
 
 function Login() {
-    const navigate = useNavigate();  
+    const navigate = useNavigate();
+    const [error, setError] = useState('');
 
     const handleGoogleLoginSuccess = async (credentialResponse) => {
-        const decoded = jwtDecode(credentialResponse.credential);
-
-        // Log the user info pulled from Google OAuth
-        console.log('Decoded user info:', decoded);
-
-        const userData = {
-            name: decoded.name,
-            email: decoded.email,
-            username: decoded.given_name,
-            image: decoded.picture,
-        };
-
         try {
-            // Check if user exists and log user data to console
+            const decoded = jwtDecode(credentialResponse.credential);
+            console.log('Decoded user info:', decoded);
+            
+            const userData = {
+                name: decoded.name,
+                email: decoded.email,
+                username: decoded.given_name,
+                image: decoded.picture,
+            };
+            
             console.log('User data to send to backend:', userData);
-
-            const response = await axios.post('https://publish-0341c21de65c.herokuapp.com/users/login/', userData);
+            
+            const response = await axios.post(
+                'https://publish-0341c21de65c.herokuapp.com/users/login/',
+                userData
+            );
+            
             console.log('Response from backend:', response.data);
-
+            
             Cookies.set('user', JSON.stringify(response.data), { expires: 7 });
             navigate('/');
+            
         } catch (error) {
             console.error('Login error:', error);
-            alert('An error occurred during login.');
+            setError('An error occurred during login. Please try again.');
         }
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-indigo-600">
-            <div className="header">
-                <Link to="/">Home</Link>
-                <Link to="/AddNewItem">Add Item</Link>
-                <Link to="/EditItem">Edit List</Link>
-                <Link to="/Lists">Preview List</Link>
-                <Link to="/EditUser">User Settings</Link>
-                <Link to="/Admin">Admin</Link>
-            </div>
-            <div className="w-96 p-6 shadow-lg bg-white rounded-md">
-                <h1 className="text-3xl block text-center font-semibold">
-                    <i className="fa-solid fa-user"></i> Login using Google
-                </h1>
-                <hr className="mt-3" />
-                <GoogleLogin
-                    onSuccess={handleGoogleLoginSuccess}
-                    onError={() => {
-                        console.log('Login Failed');
-                    }}
-                />
+        <div className="login-container">
+            <div className="login-content">
+                <div className="login-card">
+                    <div className="brand">
+                        <h1>Wishlist</h1>
+                        <div className="brand-subtitle">Your dreams, organized</div>
+                    </div>
+
+                    <div className="login-header">
+                        <h2>Welcome Back</h2>
+                        <p>Sign in to continue to your wishlist</p>
+                    </div>
+
+                    <div className="google-login-wrapper">
+                        <GoogleLogin
+                            onSuccess={handleGoogleLoginSuccess}
+                            onError={() => {
+                                setError('Login failed. Please try again.');
+                                console.log('Login Failed');
+                            }}
+                        />
+                    </div>
+
+                    {error && <div className="error-message">{error}</div>}
+
+                    <div className="terms-section">
+                        <p>By signing in, you agree to our</p>
+                        <div className="terms-links">
+                            <a href="#" className="terms-link">Terms of Service</a>
+                            <span>and</span>
+                            <a href="#" className="terms-link">Privacy Policy</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="decorative-pattern"></div>
             </div>
         </div>
     );
