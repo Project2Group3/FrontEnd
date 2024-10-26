@@ -39,17 +39,19 @@ const Admin = () => {
 
     return (
         <div>
-            <div className="header">
-                <div>
-                    <Link to="/">Home</Link>
-                    <Link to="/AddNewItem">Add Item</Link>
-                    <Link to="/EditItem">Edit List</Link>
-                    <Link to="/Lists">Preview List</Link>
-                    <Link to="/EditUser">User Settings</Link>
-                    <Link to="/Admin">Admin</Link>
-                </div>
-                <Link to="/logout">Logout</Link>
-            </div>
+            <nav className="nav-container">
+    <div className="nav-content">
+        <Link to="/" className="nav-brand">
+            Wishlist API
+        </Link>
+        <div className="nav-links">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/Lists" className="nav-link">Lists</Link>
+            <Link to="/UpdateUserInfo" className="nav-link">Update UserInfo</Link>
+            {/* {user.is_admin && <Link to="/Admin" className="nav-link">Admin</Link>} */}
+        </div>
+    </div>
+</nav>
 
             <div className="container">
                 <div className="section">

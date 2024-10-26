@@ -8,18 +8,46 @@ body {
     background-color: #f0f0f0;
 }
 
-.header {
+.nav-container {
     background-color: #333;
-    color: white;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
+    padding: 1rem;
+    margin-bottom: 2rem;
 }
 
-.header a {
+.nav-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-brand {
     color: white;
     text-decoration: none;
-    padding: 5px 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+    background-color: #444;
+}
+
+.nav-link.active {
+    background-color: #555;
 }
 
 .edit-item-container {
