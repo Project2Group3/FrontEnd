@@ -77,11 +77,11 @@ const Admin = () => {
         try{
             const response = await axios.post(`https://publish-0341c21de65c.herokuapp.com/admin/users/create/`, userData, {
                 headers: {
-                    'is_admin': user.is_admin ? 'true' : 'false'
+                    'Is-Admin': user.is_admin ? 'true' : 'false'
                 }
             });
             alert("user craeted");
-            set([...users, response.data]);
+            setUsers([...users, response.data]);
             setNewUser({username:'',name:'',email:'',isAdmin:false});
         } catch(error){
             console.error("Error creating user", error);
