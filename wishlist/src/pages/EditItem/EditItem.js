@@ -1,249 +1,185 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './EditItem.css';
 
 const EditItem = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const queryParams = new URLSearchParams(location.search);
+    const itemId = queryParams.get('itemId');
+
     const [formData, setFormData] = useState({
-        itemName: '',
-        itemPrice: '',
-        itemDescription: '',
-        itemUrl: '',
-        itemImage: '',
-        priority: '0'
+        name: '',
+        price: '',
+        description: '',
+        url: '',
+        image: ''
     });
 
-    const [searchInput, setSearchInput] = useState('');
-    const [searchType, setSearchType] = useState('id'); // 'id' or 'term'
-    const [currentItem, setCurrentItem] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    const fetchItemById = async (itemId) => {
-        setLoading(true);
-        setError('');
-        try {
-            // In a real app, this would be an API call like:
-            // const response = await fetch(`/items?itemID=${itemId}`);
-            // const data = await response.json();
-            
-            // Simulated API response
-            const dummyData = {
-                id: itemId,
-                itemName: `Item ${itemId}`,
-                itemPrice: '99.99',
-                itemDescription: 'This is an example item description.',
-                itemUrl: 'https://example.com/item',
-                itemImage: 'https://example.com/image.jpg',
-                priority: '3'
-            };
-
-            setCurrentItem(dummyData);
-            setFormData({
-                itemName: dummyData.itemName,
-                itemPrice: dummyData.itemPrice,
-                itemDescription: dummyData.itemDescription,
-                itemUrl: dummyData.itemUrl,
-                itemImage: dummyData.itemImage,
-                priority: dummyData.priority
-            });
-        } catch (error) {
-            setError('Failed to fetch item. Please try again.');
-            console.error('Error fetching item:', error);
-        } finally {
+    useEffect(() => {
+        if (!itemId) {
+            setError('No item specified');
             setLoading(false);
-        }
-    };
-
-    const searchItemByTerm = async (searchTerm) => {
-        setLoading(true);
-        setError('');
-        try {
-            // In a real app, this would be an API call like:
-            // const response = await fetch(`/items?search=${searchTerm}`);
-            // const data = await response.json();
-            
-            // Simulated API response
-            const dummyResult = {
-                id: '123',
-                itemName: `${searchTerm} Item`,
-                itemPrice: '79.99',
-                itemDescription: `Item matching search term: ${searchTerm}`,
-                itemUrl: 'https://example.com/item',
-                itemImage: 'https://example.com/image.jpg',
-                priority: '4'
-            };
-
-            setCurrentItem(dummyResult);
-            setFormData({
-                itemName: dummyResult.itemName,
-                itemPrice: dummyResult.itemPrice,
-                itemDescription: dummyResult.itemDescription,
-                itemUrl: dummyResult.itemUrl,
-                itemImage: dummyResult.itemImage,
-                priority: dummyResult.priority
-            });
-        } catch (error) {
-            setError('Failed to search for item. Please try again.');
-            console.error('Error searching item:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        if (!searchInput.trim()) {
-            setError('Please enter a search term or ID');
             return;
         }
+        fetchItem();
+    }, [itemId]);
 
-        setError('');
-        if (searchType === 'id') {
-            await fetchItemById(searchInput);
-        } else {
-            await searchItemByTerm(searchInput);
+    const fetchItem = async () => {
+        try {
+            console.log('Fetching item details for ID:', itemId);
+            const response = await axios.get(
+                `https://publish-0341c21de65c.herokuapp.com/items/${itemId}`
+            );
+            console.log('Received item details:', response.data);
+            
+            setFormData({
+                name: response.data.name,
+                price: response.data.price,
+                description: response.data.description || '',
+                url: response.data.url,
+                image: response.data.image || ''
+            });
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching item:', error);
+            setError('Failed to fetch item details');
+            setLoading(false);
         }
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        console.log('Form field changed:', name, value);
         setFormData(prevState => ({
             ...prevState,
             [name]: value
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Form submitted', formData);
-        // Add your API call logic here to update the item
+        setLoading(true);
+        setError('');
+
+        try {
+            console.log('Updating item with data:', formData);
+            const response = await axios.patch(
+                `https://publish-0341c21de65c.herokuapp.com/items/${itemId}`,
+                {
+                    name: formData.name,
+                    price: parseFloat(formData.price),
+                    description: formData.description,
+                    url: formData.url,
+                    image: formData.image
+                }
+            );
+            console.log('Item updated successfully:', response.data);
+            
+            // Navigate back to the lists page
+            navigate('/lists');
+        } catch (error) {
+            console.error('Error updating item:', error);
+            setError(error.response?.data?.message || 'Failed to update item');
+        } finally {
+            setLoading(false);
+        }
     };
+
+    if (!itemId) {
+        return (
+            <div className="edit-item-container">
+                <div className="error-message">No item specified. Please select an item to edit.</div>
+                <Link to="/lists" className="back-button">Back to Lists</Link>
+            </div>
+        );
+    }
 
     return (
         <div>
             <nav className="nav-container">
-    <div className="nav-content">
-        <Link to="/" className="nav-brand">
-            Wishlist API
-        </Link>
-        <div className="nav-links">
-            <Link to="/" className="nav-link">Home</Link>
-            <Link to="/Lists" className="nav-link">Lists</Link>
-            <Link to="/UpdateUserInfo" className="nav-link">Update UserInfo</Link>
-            {/* {user.is_admin && <Link to="/Admin" className="nav-link">Admin</Link>} */}
-        </div>
-    </div>
-</nav>
-            
-            <div className="edit-item-container">
-                <div className="search-section">
-                    <h3>Find Specific Item</h3>
-                    <form onSubmit={handleSearch} className="search-form">
-                        <div className="search-group">
-                            <select 
-                                value={searchType}
-                                onChange={(e) => setSearchType(e.target.value)}
-                                className="search-type"
-                            >
-                                <option value="id">Search by ID</option>
-                                <option value="term">Search by Term</option>
-                            </select>
-                            <input
-                                type="text"
-                                value={searchInput}
-                                onChange={(e) => setSearchInput(e.target.value)}
-                                placeholder={searchType === 'id' ? "Enter item ID..." : "Enter search term..."}
-                                className="search-input"
-                            />
-                            <button 
-                                type="submit" 
-                                className="search-button"
-                                disabled={loading}
-                            >
-                                {loading ? 'Searching...' : 'Find Item'}
-                            </button>
-                        </div>
-                    </form>
-                    {error && <div className="error-message">{error}</div>}
-                </div>
-
-                {currentItem && (
-                    <div>
-                        <h2>Edit Item</h2>
-                        <form id="editItemForm" onSubmit={handleSubmit}>
-                            <div className="form-group">
-                                <label htmlFor="itemName">Name:</label>
-                                <input 
-                                    type="text" 
-                                    id="itemName" 
-                                    name="itemName" 
-                                    value={formData.itemName}
-                                    onChange={handleChange}
-                                    required 
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="itemPrice">Price:</label>
-                                <input 
-                                    type="number" 
-                                    id="itemPrice" 
-                                    name="itemPrice" 
-                                    step="0.01" 
-                                    min="0"
-                                    value={formData.itemPrice}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="itemDescription">Description:</label>
-                                <textarea 
-                                    id="itemDescription" 
-                                    name="itemDescription"
-                                    value={formData.itemDescription}
-                                    onChange={handleChange}
-                                ></textarea>
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="itemUrl">URL:</label>
-                                <input 
-                                    type="url" 
-                                    id="itemUrl" 
-                                    name="itemUrl"
-                                    value={formData.itemUrl}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="itemImage">Image URL:</label>
-                                <input 
-                                    type="url" 
-                                    id="itemImage" 
-                                    name="itemImage"
-                                    value={formData.itemImage}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Priority:</label>
-                                <div className="star-rating">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <React.Fragment key={star}>
-                                            <input
-                                                type="radio"
-                                                id={`star${star}`}
-                                                name="priority"
-                                                value={star}
-                                                onChange={handleChange}
-                                                checked={formData.priority === star.toString()}
-                                            />
-                                            <label htmlFor={`star${star}`}>&#9733;</label>
-                                        </React.Fragment>
-                                    ))}
-                                </div>
-                            </div>
-                            <button type="submit">Update</button>
-                        </form>
+                <div className="nav-content">
+                    <Link to="/" className="nav-brand">
+                        Wishlist API
+                    </Link>
+                    <div className="nav-links">
+                        <Link to="/" className="nav-link">Home</Link>
+                        <Link to="/Lists" className="nav-link">Lists</Link>
+                        <Link to="/UpdateUserInfo" className="nav-link">Update UserInfo</Link>
                     </div>
+                </div>
+            </nav>
+
+            <div className="edit-item-container">
+                <h2>Edit Item</h2>
+                {error && <div className="error-message">{error}</div>}
+                
+                {loading ? (
+                    <div className="loading">Loading item details...</div>
+                ) : (
+                    <form id="editItemForm" onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label htmlFor="name">Name:</label>
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                value={formData.name}
+                                onChange={handleChange}
+                                required 
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="price">Price:</label>
+                            <input 
+                                type="number" 
+                                id="price" 
+                                name="price" 
+                                step="0.01" 
+                                min="0"
+                                value={formData.price}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="description">Description:</label>
+                            <textarea 
+                                id="description" 
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                            ></textarea>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="url">URL:</label>
+                            <input 
+                                type="url" 
+                                id="url" 
+                                name="url"
+                                value={formData.url}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="image">Image URL:</label>
+                            <input 
+                                type="url" 
+                                id="image" 
+                                name="image"
+                                value={formData.image}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <button type="submit" disabled={loading}>
+                            {loading ? 'Updating...' : 'Update Item'}
+                        </button>
+                    </form>
                 )}
             </div>
         </div>
