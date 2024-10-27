@@ -18,7 +18,7 @@ function Login() {
             const userData = {
                 name: decoded.name,
                 email: decoded.email,
-                username: decoded.given_name,
+                username: decoded.email,
                 image: decoded.picture,
             };
             

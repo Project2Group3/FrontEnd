@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -17,16 +17,7 @@ function Lists() {
     // Get user data from cookies
     const user = JSON.parse(Cookies.get('user') || '{}');
 
-    useEffect(() => {
-        if (!user.id) {
-            navigate('/login');
-            return;
-        }
-        fetchUserLists();
-    }, [user.id]);
-
-    const fetchUserLists = async () => {
-      console.log('Fetching lists for user:', user.id);
+    const fetchUserLists = useCallback( async () => {
         try {
             const response = await axios.get(
                 `https://publish-0341c21de65c.herokuapp.com/users/${user.id}/lists`
@@ -38,7 +29,16 @@ function Lists() {
             console.error('Error fetching lists:', error);
             setLoading(false);
         }
-    };
+    }, [user.id]);
+
+    useEffect(() => {
+        if (!user.id) {
+            navigate('/login');
+            return;
+        }
+        fetchUserLists();
+    }, [user.id, navigate, fetchUserLists]);
+
 
     const handleCreateList = async (e) => {
         e.preventDefault();
@@ -79,7 +79,13 @@ function Lists() {
     const fetchListItems = async (listId) => {
         try {
             const response = await axios.get(
-                `https://publish-0341c21de65c.herokuapp.com/user_item_list/${listId}/list-items`
+                `https://publish-0341c21de65c.herokuapp.com/user_item_list/${listId}/list-items`,
+                {
+                    headers:{
+                        'User-Id': user.id,
+                        'is_admin':user.is_admin 
+                    }
+                }
             );
             setListItems({
                 ...listItems,
