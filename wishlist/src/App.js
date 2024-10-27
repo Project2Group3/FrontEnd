@@ -35,9 +35,6 @@ function App() {
 
   return (
     <div className="App">
-      <div className="page-top">
-        <h1>Wishlist Api</h1>
-      </div>
       <div className="nav-area">
         <Routes>
           {/* Public routes */}
