@@ -1,38 +1,64 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import './EditUser.css';
-
 const EditUser = () => {
-    const [user, setUser] = useState({
-        name: '',
-        password: '',
-        confirmPassword: ''
-    });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setUser(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
+    const navigate = useNavigate();
+    const [message, setMessage] = useState('');
+    const [newUserName, setNewUserName] = useState('');
+    const [newImage, setNewImage] = useState('');
+    const user = JSON.parse(Cookies.get('user') || '{}');
 
-    const handleSubmit = (e) => {
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (user.password !== user.confirmPassword) {
-            alert("Passwords don't match!");
-            return;
+
+        const updateData ={};
+        if (newUserName !== ''){
+            updateData.username=newUserName;
         }
-        // Here you would typically send the update request to your API
-        console.log('Updating user:', user);
-        // Add your API call logic here
+        if (newImage !== ''){
+            updateData.image=newImage;
+        }
+        try {
+            console.log('Updating user:', user);
+            await axios.patch(
+                `https://publish-0341c21de65c.herokuapp.com/users/${user.id}`,
+                updateData,
+                {
+                    headers:{
+                        'User-Id' :user.id
+                    }
+                }
+            );
+            setMessage('Profile updated successfully');
+        } catch (error) {
+            console.error('Error updating user:', error);
+            setMessage('Failed to update profile');
+        }
     };
 
-    const handleDeleteAccount = () => {
-        if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-            // Here you would typically send the delete request to your API
-            console.log('Deleting account');
-            // Add your API call logic here
+    const handleDeleteAccount = async (userId) => {
+        if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
+        
+        try {
+            await axios.delete(
+                `https://publish-0341c21de65c.herokuapp.com/users/${userId}`,
+                {
+                    headers:{
+                        'User-Id' :user.id
+                    }
+                }
+            );
+            setMessage('Failed to update profile');
+            // Cookies.remove('user');
+            navigate('/login');
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            setMessage('Failed to delete account');
+            // setError('Failed to delete user');
         }
     };
 
@@ -55,39 +81,31 @@ const EditUser = () => {
                 <h2>Edit User Profile</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="name">Name:</label>
+                        <label htmlFor="name">New Username:</label>
                         <input
                             type="text"
                             id="name"
                             name="name"
-                            value={user.name}
-                            onChange={handleChange}
-                            required
+                            value={user.username}
+                            onChange={(e) => setNewUserName(e.target.value)}
+                            placeholder='Enter New Username'
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="password">New Password:</label>
+                        <label htmlFor="image">New Image URL:</label>
                         <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={user.password}
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="confirmPassword">Confirm New Password:</label>
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            value={user.confirmPassword}
-                            onChange={handleChange}
+                            type="text"
+                            id="image"
+                            name="image"
+                            value={user.image}
+                            onChange={(e) => setNewImage(e.target.value)}
+                            placeholder='Enter New Image Link'
                         />
                     </div>
                     <button type="submit" className="update-btn">Update Profile</button>
                 </form>
-                <button onClick={handleDeleteAccount} className="delete-btn">Delete Account</button>
+                <button onClick={() => handleDeleteAccount(user.id)} className="delete-btn">Delete Account</button>
+                {message && <div className="message">{message}</div>}
             </div>
         </div>
     );

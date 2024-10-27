@@ -83,7 +83,7 @@ function Lists() {
                 {
                     headers:{
                         'User-Id': user.id,
-                        'is_admin':user.is_admin 
+                        'Is-Admin':user.is_admin 
                     }
                 }
             );
