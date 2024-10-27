@@ -16,12 +16,18 @@ const EditUser = () => {
         e.preventDefault();
 
         const updateData ={};
-        if (newUserName !== ''){
+        if(newUserName!=='' && newImage!=='' ){
             updateData.username=newUserName;
-        }
-        if (newImage !== ''){
             updateData.image=newImage;
         }
+        else if (newUserName !== ''){
+            updateData.username=newUserName;
+        }
+        else if (newImage !== ''){
+            updateData.image=newImage;
+        }
+
+        console.log("UPDATE:",updateData)
         try {
             console.log('Updating user:', user);
             await axios.patch(
@@ -86,7 +92,7 @@ const EditUser = () => {
                             type="text"
                             id="name"
                             name="name"
-                            value={user.username}
+                            value={newUserName}
                             onChange={(e) => setNewUserName(e.target.value)}
                             placeholder='Enter New Username'
                         />
@@ -97,7 +103,7 @@ const EditUser = () => {
                             type="text"
                             id="image"
                             name="image"
-                            value={user.image}
+                            value={newImage}
                             onChange={(e) => setNewImage(e.target.value)}
                             placeholder='Enter New Image Link'
                         />
